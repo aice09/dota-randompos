@@ -13,19 +13,23 @@
     <div class="container my-5">
         <h1 class="text-center">Dota 2 Position Assignment</h1>
 		<!-- Add this dropdown above the generate button -->
-		<div class="mt-3">
-			<label for="addHeroOption" class="form-label">Hero Options:</label>
-			<select id="addHeroOption" class="form-select">
-				<option value="" selected disabled>Select Option</option>
-				<option value="none">None</option>
-				<option value="addHero">Add Hero</option>
-			</select>
-		</div>
-		<!-- Add this above the Hero Options dropdown -->
-		<div class="mt-3" id="numHeroesDiv" style="display: none;">
-			<label for="numHeroes" class="form-label">Number of Heroes to Provide (1-5):</label>
-			<input type="number" id="numHeroes" class="form-control" min="1" max="5" placeholder="Enter number of heroes" required>
-		</div>
+<div class="mt-3">
+    <label for="addHeroOption" class="form-label">Hero Options:</label>
+    <select id="addHeroOption" class="form-select">
+        <option value="" selected disabled>Select Option</option>
+        <option value="none">None</option>
+        <option value="addHero">Add Hero</option>
+    </select>
+</div>
+<!-- Add this above the Hero Options dropdown -->
+<!-- Add this above the Hero Options dropdown -->
+<div class="mt-3" id="numHeroesDiv" style="display: none;">
+    <label for="numHeroes" class="form-label">Number of Heroes to Provide (1-5):</label>
+    <input type="number" id="numHeroes" class="form-control" min="1" max="5" placeholder="Enter number of heroes" required>
+</div>
+
+
+
         <div class="mt-4">
             <label for="playersTextarea" class="form-label">Enter Player Names (comma-separated):</label>
             <textarea id="playersTextarea" class="form-control" rows="3" placeholder="e.g., Player1, Player2, Player3, Player4, Player5"></textarea>
@@ -44,28 +48,34 @@
                     <tr>
                         <th>Position</th>
                         <th>Player</th>
+                        <th>Heroes</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td>Position 1 (Carry)</td>
-                        <td id="position1"></td>
+                        <td id="position1"></td>						
+                        <td id="carryheroes"></td>
                     </tr>
                     <tr>
                         <td>Position 2 (Mid)</td>
-                        <td id="position2"></td>
+                        <td id="position2"></td>					
+                        <td id="midheroes"></td>
                     </tr>
                     <tr>
                         <td>Position 3 (Offlane)</td>
                         <td id="position3"></td>
+                        <td id="offlanheroes"></td>
                     </tr>
                     <tr>
                         <td>Position 4 (Soft Support)</td>
                         <td id="position4"></td>
+                        <td id="softsupporheroes"></td>
                     </tr>
                     <tr>
                         <td>Position 5 (Hard Support)</td>
                         <td id="position5"></td>
+                        <td id="hardsupportheroes"></td>
                     </tr>
                 </tbody>
             </table>
@@ -100,120 +110,129 @@
 			});
 
 			$('#generateButton').click(function () {
-				// Get player names from textarea
-				const playerInput = $('#playersTextarea').val().trim();
-				const playerNames = playerInput.split(',').map(name => name.trim()).filter(name => name);
+    // Get player names from textarea
+    const playerInput = $('#playersTextarea').val().trim();
+    const playerNames = playerInput.split(',').map(name => name.trim()).filter(name => name);
 
-				// Get randomization count
-				const randomizeCount = parseInt($('#randomizeCount').val(), 10);
+    // Get randomization count
+    const randomizeCount = parseInt($('#randomizeCount').val(), 10);
 
-				// Get number of heroes to provide (min 1, max 5)
-				const numHeroes = parseInt($('#numHeroes').val(), 10);
+    // Get number of heroes to provide (min 1, max 5)
+    const numHeroes = parseInt($('#numHeroes').val(), 10);
 
-				// Get hero option
-				const heroOption = $('#addHeroOption').val();
-				if (!heroOption) {
-					alert('Please select a hero option.');
-					return;
-				}
+    // Get hero option
+    const heroOption = $('#addHeroOption').val();
+    if (!heroOption) {
+        alert('Please select a hero option.');
+        return;
+    }
 
-				// Validate inputs
-				if (playerNames.length < 5) {
-					alert('Please enter at least 5 names separated by commas.');
-					return;
-				}
-				if (!randomizeCount || randomizeCount < 1) {
-					alert('Please enter a valid number of randomizations.');
-					return;
-				}
-				if (heroOption === 'addHero' && (isNaN(numHeroes) || numHeroes < 1 || numHeroes > 5)) {
-					alert('Please enter a valid number of heroes between 1 and 5.');
-					return;
-				}
+    // Validate inputs
+    if (playerNames.length < 5) {
+        alert('Please enter at least 5 names separated by commas.');
+        return;
+    }
+    if (!randomizeCount || randomizeCount < 1) {
+        alert('Please enter a valid number of randomizations.');
+        return;
+    }
+    if (heroOption === 'addHero' && (isNaN(numHeroes) || numHeroes < 1 || numHeroes > 5)) {
+        alert('Please enter a valid number of heroes between 1 and 5.');
+        return;
+    }
 
-				// Initialize randomized names
-				let randomizedNames = [...playerNames];
-				const dotaHeroes = [
-				"Anti-Mage", "Axe", "Bane", "Bloodseeker", "Crystal Maiden", 
-				"Drow Ranger", "Earthshaker", "Juggernaut", "Mirana", "Morphling",
-				"Shadow Fiend", "Phantom Lancer", "Puck", "Pudge", "Razor",
-				"Sand King", "Storm Spirit", "Sven", "Tiny", "Vengeful Spirit", 
-				"Windranger", "Zeus", "Kunkka", "Lina", "Lich", 
-				"Lion", "Shadow Shaman", "Slardar", "Tidehunter", "Witch Doctor", 
-				"Riki", "Enigma", "Tinker", "Sniper", "Necrophos", 
-				"Warlock", "Beastmaster", "Queen of Pain", "Venomancer", "Faceless Void", 
-				"Wraith King", "Death Prophet", "Phantom Assassin", "Pugna", "Templar Assassin", 
-				"Viper", "Luna", "Dragon Knight", "Dazzle", "Clockwerk", 
-				"Leshrac", "Nature's Prophet", "Lifestealer", "Dark Seer", "Clinkz", 
-				"Omniknight", "Enchantress", "Huskar", "Night Stalker", "Broodmother", 
-				"Bounty Hunter", "Weaver", "Jakiro", "Batrider", "Chen", 
-				"Spectre", "Doom", "Ancient Apparition", "Ursa", "Spirit Breaker", 
-				"Gyrocopter", "Alchemist", "Invoker", "Silencer", "Outworld Destroyer", 
-				"Lycan", "Brewmaster", "Shadow Demon", "Lone Druid", "Chaos Knight", 
-				"Meepo", "Treant Protector", "Ogre Magi", "Undying", "Rubick", 
-				"Disruptor", "Nyx Assassin", "Naga Siren", "Keeper of the Light", "Io", 
-				"Visage", "Slark", "Medusa", "Troll Warlord", "Centaur Warrunner", 
-				"Magnus", "Timbersaw", "Bristleback", "Tusk", "Skywrath Mage", 
-				"Abaddon", "Elder Titan", "Legion Commander", "Ember Spirit", "Earth Spirit", 
-				"Underlord", "Terrorblade", "Phoenix", "Techies", "Oracle", 
-				"Winter Wyvern", "Arc Warden", "Monkey King", "Dark Willow", "Pangolier", 
-				"Grimstroke", "Hoodwink", "Void Spirit", "Snapfire", "Mars", 
-				"Ringmaster", "Dawnbreaker", "Marci", "Primal Beast", "Muerta"
-			];
+    // Initialize randomized names
+    let randomizedNames = [...playerNames];
+    const dotaHeroes = [
+    "Anti-Mage", "Axe", "Bane", "Bloodseeker", "Crystal Maiden", 
+    "Drow Ranger", "Earthshaker", "Juggernaut", "Mirana", "Morphling",
+    "Shadow Fiend", "Phantom Lancer", "Puck", "Pudge", "Razor",
+    "Sand King", "Storm Spirit", "Sven", "Tiny", "Vengeful Spirit", 
+    "Windranger", "Zeus", "Kunkka", "Lina", "Lich", 
+    "Lion", "Shadow Shaman", "Slardar", "Tidehunter", "Witch Doctor", 
+    "Riki", "Enigma", "Tinker", "Sniper", "Necrophos", 
+    "Warlock", "Beastmaster", "Queen of Pain", "Venomancer", "Faceless Void", 
+    "Wraith King", "Death Prophet", "Phantom Assassin", "Pugna", "Templar Assassin", 
+    "Viper", "Luna", "Dragon Knight", "Dazzle", "Clockwerk", 
+    "Leshrac", "Nature's Prophet", "Lifestealer", "Dark Seer", "Clinkz", 
+    "Omniknight", "Enchantress", "Huskar", "Night Stalker", "Broodmother", 
+    "Bounty Hunter", "Weaver", "Jakiro", "Batrider", "Chen", 
+    "Spectre", "Doom", "Ancient Apparition", "Ursa", "Spirit Breaker", 
+    "Gyrocopter", "Alchemist", "Invoker", "Silencer", "Outworld Destroyer", 
+    "Lycan", "Brewmaster", "Shadow Demon", "Lone Druid", "Chaos Knight", 
+    "Meepo", "Treant Protector", "Ogre Magi", "Undying", "Rubick", 
+    "Disruptor", "Nyx Assassin", "Naga Siren", "Keeper of the Light", "Io", 
+    "Visage", "Slark", "Medusa", "Troll Warlord", "Centaur Warrunner", 
+    "Magnus", "Timbersaw", "Bristleback", "Tusk", "Skywrath Mage", 
+    "Abaddon", "Elder Titan", "Legion Commander", "Ember Spirit", "Earth Spirit", 
+    "Underlord", "Terrorblade", "Phoenix", "Techies", "Oracle", 
+    "Winter Wyvern", "Arc Warden", "Monkey King", "Dark Willow", "Pangolier", 
+    "Grimstroke", "Hoodwink", "Void Spirit", "Snapfire", "Mars", 
+    "Ringmaster", "Dawnbreaker", "Marci", "Primal Beast", "Muerta"
+];
 
 
-				console.log('--start generate--');
-				for (let i = 0; i < randomizeCount; i++) {
-					randomizedNames = shuffleArray([...randomizedNames]); // Randomize order
-					
-					// Select the first 5 players
-					const selectedPlayers = randomizedNames.slice(0, 5);
-					const unselectedPlayers = randomizedNames.slice(5);
+    console.log('--start generate--');
+    for (let i = 0; i < randomizeCount; i++) {
+        randomizedNames = shuffleArray([...randomizedNames]); // Randomize order
+        
+        // Select the first 5 players
+        const selectedPlayers = randomizedNames.slice(0, 5);
+        const unselectedPlayers = randomizedNames.slice(5);
 
-					// Print randomization results with heroes if "Add Hero" is selected
-					const heroResults = heroOption === 'addHero' ? selectedPlayers.map(player => {
-						// Assign specified number of random heroes
-						const heroOptions = shuffleArray([...dotaHeroes]).slice(0, numHeroes); // Random heroes based on user input
-						return { player, heroes: heroOptions };
-					}) : [];
+        // Print randomization results with heroes if "Add Hero" is selected
+        const heroResults = heroOption === 'addHero' ? selectedPlayers.map(player => {
+            // Assign specified number of random heroes
+            const heroOptions = shuffleArray([...dotaHeroes]).slice(0, numHeroes); // Random heroes based on user input
+            return { player, heroes: heroOptions };
+        }) : [];
 
-					console.log(`Randomization ${i + 1}:`, {
-						"Position 1 (Carry)": selectedPlayers[0],
-						"Position 2 (Mid)": selectedPlayers[1],
-						"Position 3 (Offlane)": selectedPlayers[2],
-						"Position 4 (Soft Support)": selectedPlayers[3],
-						"Position 5 (Hard Support)": selectedPlayers[4],
-						"Heroes": heroResults
-					});
+        console.log(`Randomization ${i + 1}:`, {
+            "Position 1 (Carry)": selectedPlayers[0],
+            "Position 2 (Mid)": selectedPlayers[1],
+            "Position 3 (Offlane)": selectedPlayers[2],
+            "Position 4 (Soft Support)": selectedPlayers[3],
+            "Position 5 (Hard Support)": selectedPlayers[4],
+            "Heroes": heroResults
+        });
 
-					console.log(`Unselected players:`, unselectedPlayers);
-				}
-				console.log('--end generate--');
+        console.log(`Unselected players:`, unselectedPlayers);
+    }
+    console.log('--end generate--');
 
-				// Assign the last randomized names to positions
-				$('#position1').text(randomizedNames[0]);
-				$('#position2').text(randomizedNames[1]);
-				$('#position3').text(randomizedNames[2]);
-				$('#position4').text(randomizedNames[3]);
-				$('#position5').text(randomizedNames[4]);
+    // Assign the last randomized names to positions
+    $('#position1').text(randomizedNames[0]);
+    $('#position2').text(randomizedNames[1]);
+    $('#position3').text(randomizedNames[2]);
+    $('#position4').text(randomizedNames[3]);
+    $('#position5').text(randomizedNames[4]);
+	
+	
+	// Update hero data for each player in the table's "Heroes" column
+    if (heroOption === 'addHero') {
+        // Update the heroes for each position in the 3rd column (Heroes)
+        $('#carryheroes').text(shuffleArray([...dotaHeroes]).slice(0, numHeroes).join(', '));
+        $('#midheroes').text(shuffleArray([...dotaHeroes]).slice(0, numHeroes).join(', '));
+        $('#offlanheroes').text(shuffleArray([...dotaHeroes]).slice(0, numHeroes).join(', '));
+        $('#softsupporheroes').text(shuffleArray([...dotaHeroes]).slice(0, numHeroes).join(', '));
+        $('#hardsupportheroes').text(shuffleArray([...dotaHeroes]).slice(0, numHeroes).join(', '));
+    } else {
+        // If no heroes are selected, clear the hero fields
+        $('#carryheroes').text('');
+        $('#midheroes').text('');
+        $('#offlanheroes').text('');
+        $('#softsupporheroes').text('');
+        $('#hardsupportheroes').text('');
+    }
+	
+    
 
-				// Add hero options if selected
-				if (heroOption === 'addHero') {
-					$('#output table thead tr').append('<th>Heroes</th>');
-					$('#output table tbody tr').each(function (index) {
-						if (index < 5) {
-							// Assign random heroes based on the number input
-							const heroOptions = shuffleArray([...dotaHeroes]).slice(0, numHeroes); // Random heroes based on user input
-							$(this).append(`<td>${heroOptions.join(', ')}</td>`);
-						}
-					});
-				}
+    // Show output and toggle button states
+    $('#output').show();
+    $('#generateButton').text('Randomize Again');
+    $('#resetButton').show();
+});
 
-				// Show output and toggle button states
-				$('#output').show();
-				$('#generateButton').text('Randomize Again');
-				$('#resetButton').show();
-			});
 
            $('#resetButton').click(function () {
 				// Reset form and UI
